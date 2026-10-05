@@ -29,8 +29,9 @@ utilizan parámetros de URL. El detalle de producto consulta las variantes
 antes de agregar al carrito; el carrito requiere una sesión `CLIENTE_WEB`.
 
 La API se consume desde `/api`. En desarrollo, Vite la redirige al backend
-HTTPS. Al publicar el `dist` con Nginx, se debe configurar el mismo proxy
-`/api` en el servidor web. Las imágenes de categorías y del hero son recursos
+HTTPS. En producción, Nginx sirve el frontend y envía `/api` a la VM de
+aplicación por su IP privada, verificando el certificado TLS del backend.
+Las imágenes de categorías y del hero son recursos
 ilustrativos; los nombres, precios, ofertas y existencias provienen del
 backend. Las URL de `cdn.petshopdemo.pe` son datos de prueba que no resuelven,
 por lo que se muestra "Imagen no disponible" hasta que se registren imágenes
@@ -47,7 +48,27 @@ Desde la carpeta del proyecto:
     npm run lint
     npm run build
 
-El servidor de desarrollo de Vite no es el despliegue final. Más adelante
-Nginx podrá servir el directorio dist generado por npm run build y enrutar
-las solicitudes /api hacia la capa de aplicación por la red privada. El
-navegador del usuario no puede acceder directamente a la IP privada de Azure.
+## Despliegue en vm-petshop-web
+
+La tienda pública está en `https://68.211.121.127/`. HTTP redirige a HTTPS y
+`/cuenta` funciona con la ruta de respaldo de React. La configuración aplicada
+está en `deploy/nginx-petshop-web.conf`; Nginx la carga desde
+`/etc/nginx/sites-available/petshop-web`.
+
+Para publicar una versión nueva desde `/home/azureuser/petshop-frontend`:
+
+    npm ci
+    npm run build
+    sudo cp -a dist/. /var/www/petshop-web/
+    sudo nginx -t
+    sudo systemctl reload nginx
+
+La IP usa un certificado Let's Encrypt de corta duración. El servicio
+`snap.certbot.renew.timer` lo renueva automáticamente y el hook
+`deploy/reload-nginx-after-renewal.sh`, instalado en
+`/etc/letsencrypt/renewal-hooks/deploy/`, recarga Nginx tras cada renovación.
+Se verificó la renovación en modo de prueba con Certbot. No desactives ese
+timer: el certificado para IP vence aproximadamente cada seis días.
+
+El navegador no accede directamente a la IP privada de Azure. El panel
+administrativo existente continúa separado en la VM de aplicación.
