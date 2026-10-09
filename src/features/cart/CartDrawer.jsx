@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router'
 import { AnimatePresence, motion } from 'motion/react'
-import { Minus, Plus, ShoppingCart, Trash2, X } from 'lucide-react'
+import { ArrowRight, Minus, Plus, ShoppingCart, Trash2, X } from 'lucide-react'
 import formatPrice from '../../utils/formatPrice.js'
 import { getApiError } from '../../services/api.js'
 import useAuth from '../auth/useAuth.js'
@@ -171,7 +171,13 @@ export default function CartDrawer() {
                     <span>Subtotal</span>
                     <strong>{formatPrice(cart.resumen.subtotal)}</strong>
                   </div>
-                  <small>El checkout se habilitará en una próxima etapa.</small>
+                  <Link
+                    className="button button--primary checkout-submit"
+                    to="/carrito"
+                    onClick={closeCart}
+                  >
+                    Ver carrito <ArrowRight size={17} />
+                  </Link>
                 </div>
               </>
             )}

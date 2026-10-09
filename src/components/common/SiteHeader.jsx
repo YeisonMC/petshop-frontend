@@ -30,7 +30,7 @@ export function Brand({ light = false, onClick }) {
   )
 }
 
-export default function SiteHeader() {
+export default function SiteHeader({ showAnnouncement = true }) {
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
@@ -52,10 +52,12 @@ export default function SiteHeader() {
 
   return (
     <>
-      <div className="announcement">
-        <span className="announcement__dot" /> Un mundo mejor para sus cuatro patas{' '}
-        <span className="announcement__spark">✦</span> Descubre nuestro catálogo
-      </div>
+      {showAnnouncement && (
+        <div className="announcement">
+          <span className="announcement__dot" /> Un mundo mejor para sus cuatro patas{' '}
+          <span className="announcement__spark">✦</span> Descubre nuestro catálogo
+        </div>
+      )}
       <header className="site-header">
         <div className="site-header__inner">
           <button

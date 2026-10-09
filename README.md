@@ -11,7 +11,8 @@ consumirá las APIs de vm-petshop-app; esta última se conecta a vm-petshop-db.
 - features/auth: autenticación y perfil del cliente.
 - features/products: catálogo, consulta de productos, componentes y hooks.
 - features/cart: carrito de compras.
-- features/checkout: reservado para el flujo futuro de compra.
+- features/checkout: indicador de progreso, resumen y estilos de la compra.
+- pages/Cart, Checkout, Payment y OrderStatus: carrito, dirección, pago integrado y confirmación.
 - hooks: hooks compartidos entre distintos módulos.
 - layouts: estructuras comunes de las páginas.
 - pages: pantallas completas de inicio y cuenta.
@@ -23,7 +24,8 @@ consumirá las APIs de vm-petshop-app; esta última se conecta a vm-petshop-db.
 Cada feature mantiene sus componentes, hooks y peticiones específicos cerca de
 su propia lógica. Solo las carpetas que todavía están vacías conservan `.gitkeep`.
 
-AppRouter define las rutas `/` y `/cuenta`. El Home consulta categorías y
+AppRouter define las rutas `/`, `/cuenta`, `/carrito`, `/checkout`, `/pagar/:id` y
+`/pedido/:id`. El Home consulta categorías y
 productos de la API con TanStack Query. El buscador y los filtros de categoría
 utilizan parámetros de URL. El detalle de producto consulta las variantes
 antes de agregar al carrito; el carrito requiere una sesión `CLIENTE_WEB`.
@@ -35,7 +37,25 @@ Las imágenes de categorías y del hero son recursos
 ilustrativos; los nombres, precios, ofertas y existencias provienen del
 backend. Las URL de `cdn.petshopdemo.pe` son datos de prueba que no resuelven,
 por lo que se muestra "Imagen no disponible" hasta que se registren imágenes
-reales.
+reales en el catálogo. El resumen de compra usa una ilustración de categoría
+cuando reconoce el tipo de producto y no hay imagen real.
+
+## Pago de prueba
+
+El carrito enlaza con `/carrito` y después `/checkout`, donde el cliente elige o crea una
+dirección. La web crea un pedido usando el backend y pasa a `/pagar/:id`.
+La tarjeta se captura mediante Stripe Payment Element; la aplicación no
+recibe ni almacena los datos de tarjeta. `/pedido/:id` consulta al backend
+hasta conocer el resultado. Los importes proceden siempre del pedido
+guardado en MySQL. Para probarlo de extremo a extremo, el backend debe
+estar encendido y tener configuradas sus tres variables `STRIPE_*`, incluido
+el secreto de firma del webhook de modo test.
+
+Las cuatro pantallas mantienen la tipografía Montserrat/Roboto/Caveat y la
+paleta de SUPERPET, con versiones para escritorio, portátil y móvil. Solo la
+tarjeta está habilitada en esta demo: Link, billeteras y cupones se muestran
+como no disponibles porque el backend aún no los procesa. El envío de prueba
+es gratuito y siempre coincide con el importe calculado por el servidor.
 
 ## Comandos
 
@@ -50,7 +70,7 @@ Desde la carpeta del proyecto:
 
 ## Despliegue en vm-petshop-web
 
-La tienda pública está en `https://68.211.121.127/`. HTTP redirige a HTTPS y
+La tienda pública está en `https://petshop-web.chilecentral.cloudapp.azure.com/`. HTTP redirige a HTTPS y
 `/cuenta` funciona con la ruta de respaldo de React. La configuración aplicada
 está en `deploy/nginx-petshop-web.conf`; Nginx la carga desde
 `/etc/nginx/sites-available/petshop-web`.

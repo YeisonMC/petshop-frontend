@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 import {
   ArrowLeft,
   ArrowRight,
@@ -16,6 +16,10 @@ import heroPets from '../assets/hero-pets.webp'
 
 export default function Login() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const returnPath = searchParams.get('volver')
+  const safeReturnPath =
+    returnPath?.startsWith('/') && !returnPath.startsWith('//') ? returnPath : '/'
   const { user, checkingSession, login, register, logout } = useAuth()
   const [mode, setMode] = useState('login')
   const [showPassword, setShowPassword] = useState(false)
@@ -38,7 +42,7 @@ export default function Login() {
     try {
       if (mode === 'login') await login(payload)
       else await register(payload)
-      navigate('/', { replace: true })
+      navigate(safeReturnPath, { replace: true })
     } catch (requestError) {
       setError(
         getApiError(

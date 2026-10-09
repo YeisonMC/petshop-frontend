@@ -16,6 +16,7 @@ api.interceptors.request.use((config) => {
 
 export function getApiError(error, fallback = 'No pudimos completar la solicitud.') {
   return (
+    error.response?.data?.error?.message ||
     error.response?.data?.message ||
     (error.code === 'ECONNABORTED'
       ? 'La solicitud tardó demasiado. Inténtalo de nuevo.'
